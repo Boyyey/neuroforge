@@ -56,8 +56,7 @@ ACTIVATION_SELU       // Self-normalizing magic
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/neuroforge.git
-cd neuroforge
+git clone https://github.com/boyyey/neuroforge.git
 
 # Build with CUDA support (optional)
 make CUDA=1
