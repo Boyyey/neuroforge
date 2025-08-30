@@ -337,6 +337,6 @@ This library may cause:
 
 ---
 
-**NeuroForge** - Because sometimes you need to get closer to the metal. 🦾
+**NeuroForge** - Where theoretical excellence meets engineering perfection.
 
 *"I don't always write neural networks, but when I do, I prefer C."* - The Most Interesting Programmer in the World
