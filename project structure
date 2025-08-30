@@ -1,0 +1,34 @@
+nn_library/
+├── src/
+│   ├── matrix.h
+│   ├── matrix.c
+│   ├── layers/
+│   │   ├── layer.h
+│   │   ├── dense.c
+│   │   ├── conv2d.c
+│   │   ├── rnn.c
+│   │   └── attention.c
+│   ├── optimizers/
+│   │   ├── optimizer.h
+│   │   ├── sgd.c
+│   │   ├── adam.c
+│   │   └── rmsprop.c
+│   ├── activations/
+│   │   ├── activation.h
+│   │   └── activation.c
+│   ├── network.h
+│   ├── network.c
+│   ├── serialization.h
+│   ├── serialization.c
+│   └── cuda/
+│       ├── cuda_ops.h
+│       └── cuda_ops.cu
+├── examples/
+│   ├── xor.c
+│   ├── mnist.c
+│   └── transformer.c
+├── tests/
+│   ├── test_matrix.c
+│   ├── test_layers.c
+│   └── test_optimizers.c
+└── Makefile

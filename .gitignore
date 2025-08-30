@@ -1,0 +1,35 @@
+# .gitignore content for C project
+# Build artifacts
+obj/
+bin/
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+deps/
+
+# Logs
+*.log
+
+# Binary files
+*.bin
+*.model
+
+# Dataset files (if any)
+data/
+*.csv
+*.h5
+*.npz
