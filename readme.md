@@ -333,4 +333,4 @@ This library may cause:
 
 **NeuroForge** - Where theoretical excellence meets engineering perfection.
 
-*"I don't always write neural networks, but when I do, I prefer C."* - The Most Interesting Programmer in the World
+*"I don't always write neural networks, but when I do, I prefer C."* 
