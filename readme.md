@@ -5,6 +5,8 @@
 [![CUDA Supported](https://img.shields.io/badge/CUDA-supported-green)](https://developer.nvidia.com/cuda-toolkit)
 [![BLAS Integrated](https://img.shields.io/badge/BLAS-optimized-orange)](http://www.netlib.org/blas/)
 
+<img width="1376" height="1200" alt="neuroforge" src="https://github.com/user-attachments/assets/4b09f843-c4cc-449f-9120-6d45391153fc" />
+
 > **Warning: This library will melt your CPU and warp your understanding of what's possible in C**
 
 NeuroForge is not just another neural network library—it's a testament to what happens when you combine C's raw power with cutting-edge deep learning. This library will make you question why you ever used Python for ML in the first place.
