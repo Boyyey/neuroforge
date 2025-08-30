@@ -240,11 +240,6 @@ docker run -it --gpus all neuroforge  # GPU support included
 
 ## 📚 Learning Resources
 
-### Tutorial Series
-1. [From Zero to Neural Hero in C](https://example.com/tutorial1)
-2. [Writing CUDA Kernels That Don't Crash](https://example.com/tutorial2)
-3. [Memory Management for Mad Scientists](https://example.com/tutorial3)
-
 ### Example Projects
 - **MNIST Classification** - `examples/mnist.c`
 - **Text Generation with RNNs** - `examples/textgen.c`
