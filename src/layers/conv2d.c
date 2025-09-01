@@ -9,11 +9,14 @@ static void conv2d_forward(Layer* layer, const Matrix* input) {
     // This is a simplified placeholder
     
     if (layer->input) matrix_free(layer->input);
-    layer->input = matrix_copy(input);
+    // Create a copy of the input matrix
+    layer->input = matrix_create(input->rows, input->cols);
+    matrix_copy(layer->input, input);
     
     // For now, just pass through (actual implementation would do convolution)
     if (!layer->output) {
-        layer->output = matrix_copy(input);
+        layer->output = matrix_create(input->rows, input->cols);
+        matrix_copy(layer->output, input);
     } else {
         matrix_copy(layer->output, input);
     }
@@ -22,11 +25,15 @@ static void conv2d_forward(Layer* layer, const Matrix* input) {
 // Backward pass for 2D convolution
 static void conv2d_backward(Layer* layer, const Matrix* output_grad) {
     // Implementation would go here
+    (void)layer;      // Suppress unused parameter warning
+    (void)output_grad; // Suppress unused parameter warning
 }
 
 // Update parameters for 2D convolution
 static void conv2d_update(Layer* layer, float learning_rate) {
     // Implementation would go here
+    (void)layer;        // Suppress unused parameter warning
+    (void)learning_rate; // Suppress unused parameter warning
 }
 
 // Free conv2d layer resources
@@ -42,7 +49,7 @@ static void conv2d_free(Layer* layer) {
 
 // Create a 2D convolutional layer
 Layer* conv2d_layer(int in_channels, int out_channels, 
-                   int kernel_size, int stride, int padding, int activation) {
+                   int kernel_size, int stride, int padding, ActivationType activation) {
     Layer* layer = (Layer*)malloc(sizeof(Layer));
     memset(layer, 0, sizeof(Layer));
     

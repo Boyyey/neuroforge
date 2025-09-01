@@ -9,7 +9,9 @@ static void rnn_forward(Layer* layer, const Matrix* input) {
     // This is a simplified placeholder
     
     if (layer->input) matrix_free(layer->input);
-    layer->input = matrix_copy(input);
+    // Create a copy of the input matrix
+    layer->input = matrix_create(input->rows, input->cols);
+    matrix_copy(layer->input, input);
     
     // Initialize hidden state if needed
     if (!layer->hidden_state) {
@@ -19,7 +21,8 @@ static void rnn_forward(Layer* layer, const Matrix* input) {
     
     // For now, just pass through (actual implementation would do RNN computation)
     if (!layer->output) {
-        layer->output = matrix_copy(input);
+        layer->output = matrix_create(input->rows, input->cols);
+        matrix_copy(layer->output, input);
     } else {
         matrix_copy(layer->output, input);
     }
@@ -28,11 +31,15 @@ static void rnn_forward(Layer* layer, const Matrix* input) {
 // Backward pass for RNN layer (BPTT)
 static void rnn_backward(Layer* layer, const Matrix* output_grad) {
     // Implementation would go here
+    (void)layer;      // Suppress unused parameter warning
+    (void)output_grad; // Suppress unused parameter warning
 }
 
 // Update parameters for RNN layer
 static void rnn_update(Layer* layer, float learning_rate) {
     // Implementation would go here
+    (void)layer;        // Suppress unused parameter warning
+    (void)learning_rate; // Suppress unused parameter warning
 }
 
 // Free RNN layer resources
@@ -48,7 +55,7 @@ static void rnn_free(Layer* layer) {
 }
 
 // Create an RNN layer
-Layer* rnn_layer(int input_size, int hidden_size, int output_size, int activation) {
+Layer* rnn_layer(int input_size, int hidden_size, int output_size, ActivationType activation) {
     Layer* layer = (Layer*)malloc(sizeof(Layer));
     memset(layer, 0, sizeof(Layer));
     

@@ -41,6 +41,8 @@ float matrix_min(const Matrix* m);
 // Utility functions
 void matrix_print(const Matrix* m, const char* name);
 int matrix_equal(const Matrix* a, const Matrix* b, float tolerance);
+void matrix_from_array(Matrix* m, const float* data);
+void matrix_sqrt(Matrix* m);
 
 // CUDA support
 #ifdef USE_CUDA

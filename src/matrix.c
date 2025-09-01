@@ -5,6 +5,10 @@
 #include <math.h>
 #include <assert.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #ifdef USE_CUDA
 #include "cuda/cuda_ops.h"
 #endif
@@ -37,7 +41,7 @@ Matrix* matrix_view(Matrix* src, size_t row_start, size_t col_start,
     Matrix* view = (Matrix*)malloc(sizeof(Matrix));
     view->rows = rows;
     view->cols = cols;
-    view->stride = src->stride;
+    view->stride = src->stride;  // View must use parent's stride for correct indexing
     view->is_view = 1;
     view->data = src->data + row_start * src->stride + col_start;
     
@@ -253,4 +257,20 @@ int matrix_equal(const Matrix* a, const Matrix* b, float tolerance) {
     }
     
     return 1;
+}
+
+void matrix_from_array(Matrix* m, const float* data) {
+    for (size_t i = 0; i < m->rows; i++) {
+        for (size_t j = 0; j < m->cols; j++) {
+            m->data[i * m->stride + j] = data[i * m->cols + j];
+        }
+    }
+}
+
+void matrix_sqrt(Matrix* m) {
+    for (size_t i = 0; i < m->rows; i++) {
+        for (size_t j = 0; j < m->cols; j++) {
+            m->data[i * m->stride + j] = sqrtf(m->data[i * m->stride + j]);
+        }
+    }
 }

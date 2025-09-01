@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 // Network serialization format:
 // [magic_number:4][version:4][layer_count:4]
@@ -256,4 +257,13 @@ void load_checkpoint(Network** net, Optimizer** opt, const char* filename) {
     
     // Compile network with optimizer
     network_compile(*net, *opt, 0.0f);  // Assuming no L2 regularization for now
+}
+
+// Wrapper functions to match network.h declarations
+void network_save(Network* net, const char* filename) {
+    network_serialize(net, filename);
+}
+
+Network* network_load(const char* filename) {
+    return network_deserialize(filename);
 }

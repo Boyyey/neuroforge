@@ -1,65 +1,62 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include "../src/network.h"
 #include "../src/layers/layer.h"
 #include "../src/optimizers/optimizer.h"
+#include "../src/activations/activation.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int main() {
-    // Create XOR dataset
-    Matrix* inputs = matrix_create(4, 2);
-    Matrix* targets = matrix_create(4, 1);
-    
-    float input_data[] = {0, 0, 0, 1, 1, 0, 1, 1};
-    float target_data[] = {0, 1, 1, 0};
-    
-    memcpy(inputs->data, input_data, sizeof(input_data));
-    memcpy(targets->data, target_data, sizeof(target_data));
-    
     // Create network
     Network* net = network_create();
+    
+    // Add layers
     network_add_layer(net, dense_layer(2, 4, ACTIVATION_RELU));
     network_add_layer(net, dense_layer(4, 1, ACTIVATION_SIGMOID));
     
-    // Compile with Adam optimizer
-    Optimizer* adam = adam_optimizer(0.01f, 0.9f, 0.999f, 1e-8f);
-    network_compile(net, adam, 0.0f);  // No L2 regularization
+    // Set optimizer
+    Optimizer* adam = adam_optimizer(0.01, 0.9, 0.999, 1e-8);
+    network_set_optimizer(net, adam);
     
-    // Train network
-    for (int epoch = 0; epoch < 10000; epoch++) {
+    // Create training data (XOR problem)
+    Matrix* inputs = matrix_create(4, 2);
+    Matrix* targets = matrix_create(4, 1);
+    
+    // XOR inputs: [0,0], [0,1], [1,0], [1,1]
+    float input_data[] = {0,0, 0,1, 1,0, 1,1};
+    float target_data[] = {0, 1, 1, 0};
+    
+    matrix_from_array(inputs, input_data);
+    matrix_from_array(targets, target_data);
+    
+    printf("Training XOR network...\n");
+    
+    // Training loop
+    for (int epoch = 0; epoch < 1000; epoch++) {
         float loss = network_train(net, inputs, targets);
         
-        if (epoch % 1000 == 0) {
-            printf("Epoch %d, Loss: %.4f\n", epoch, loss);
+        if (epoch % 100 == 0) {
+            printf("Epoch %d: Loss = %.4f\n", epoch, loss);
         }
     }
     
-    // Test network
-    printf("\nTesting XOR network:\n");
-    for (int i = 0; i < 4; i++) {
-        Matrix input_view = {
-            .rows = 1,
-            .cols = 2,
-            .stride = 2,
-            .data = &inputs->data[i * 2],
-            .is_view = 1
-        };
-        
-        Matrix* output = network_forward(net, &input_view);
-        printf("Input: [%.0f, %.0f], Output: %.4f, Expected: %.0f\n",
-               input_view.data[0], input_view.data[1], 
-               output->data[0], targets->data[i]);
-        matrix_free(output);
-    }
+    // Test the network
+    Matrix* output = network_forward(net, inputs);
+    printf("\nFinal predictions:\n");
+    matrix_print(output, "Output");
     
-    // Save model
-    network_serialize(net, "xor_model.bin");
+    // Save the model
+    network_save(net, "xor_model.bin");
+    printf("Model saved to xor_model.bin\n");
     
     // Cleanup
-    network_free(net);
-    optimizer_free(adam);
     matrix_free(inputs);
     matrix_free(targets);
+    matrix_free(output);
+    network_free(net);
+    
+    // Free optimizer (we need to implement this)
+    // optimizer_free(adam);  // Commented out until we implement it
     
     return 0;
 }

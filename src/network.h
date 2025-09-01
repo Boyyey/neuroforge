@@ -25,6 +25,7 @@ typedef struct {
 Network* network_create();
 void network_add_layer(Network* net, Layer* layer);
 void network_compile(Network* net, Optimizer* optimizer, float l2_lambda);
+void network_set_optimizer(Network* net, Optimizer* optimizer);
 void network_free(Network* net);
 
 // Forward and backward pass

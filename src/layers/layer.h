@@ -2,6 +2,7 @@
 #define LAYER_H
 
 #include "../matrix.h"
+#include "../activations/activation.h"
 
 typedef enum {
     LAYER_DENSE,
@@ -31,6 +32,8 @@ typedef struct Layer {
     Matrix* input;
     Matrix* output;
     Matrix* hidden_state;  // For RNN/LSTM
+    Matrix* mask;          // For dropout layers
+    Matrix* grad_input;    // For gradient propagation
     
     // Configuration
     float dropout_rate;
@@ -41,9 +44,10 @@ typedef struct Layer {
     int stride;
     int padding;
     int heads;  // For attention
+    int is_training;       // Training mode flag
     
     // Activation
-    int activation;
+    ActivationType activation;
     
     // Methods
     void (*forward)(struct Layer* layer, const Matrix* input);
@@ -56,9 +60,9 @@ typedef struct Layer {
 } Layer;
 
 // Layer creation functions
-Layer* dense_layer(int input_size, int output_size, int activation);
-Layer* conv2d_layer(int in_channels, int out_channels, int kernel_size, int stride, int padding, int activation);
-Layer* rnn_layer(int input_size, int hidden_size, int output_size, int activation);
+Layer* dense_layer(int input_size, int output_size, ActivationType activation);
+Layer* conv2d_layer(int in_channels, int out_channels, int kernel_size, int stride, int padding, ActivationType activation);
+Layer* rnn_layer(int input_size, int hidden_size, int output_size, ActivationType activation);
 Layer* attention_layer(int embed_size, int heads);
 Layer* dropout_layer(float rate);
 Layer* batchnorm_layer(int size);

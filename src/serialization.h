@@ -7,6 +7,10 @@
 void network_serialize(Network* net, const char* filename);
 Network* network_deserialize(const char* filename);
 
+// Wrapper functions to match network.h declarations
+void network_save(Network* net, const char* filename);
+Network* network_load(const char* filename);
+
 // Checkpointing
 void save_checkpoint(Network* net, Optimizer* opt, const char* filename);
 void load_checkpoint(Network** net, Optimizer** opt, const char* filename);

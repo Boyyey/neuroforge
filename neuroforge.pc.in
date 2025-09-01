@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+Name: neuroforge
+Description: High-performance neural network library in C
+Version: @PROJECT_VERSION@
+Cflags: -I${includedir}/neuroforge
+Libs: -L${libdir} -lneuroforge
+Requires: 
+Libs.private: -lm

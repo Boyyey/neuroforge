@@ -26,7 +26,8 @@ static void adam_update(void* optimizer_ptr) {
         matrix_scale(grad, 1.0f / (1.0f - optimizer->beta1));  // Restore grad
         
         // Update biased second raw moment estimate: v = beta2 * v + (1 - beta2) * grad^2
-        Matrix* grad_squared = matrix_copy(grad);
+        Matrix* grad_squared = matrix_create(grad->rows, grad->cols);
+        matrix_copy(grad_squared, grad);
         matrix_multiply_elementwise(grad_squared, grad_squared);
         
         matrix_scale(v, optimizer->beta2);
@@ -35,10 +36,12 @@ static void adam_update(void* optimizer_ptr) {
         matrix_free(grad_squared);
         
         // Compute bias-corrected moments
-        Matrix* m_hat = matrix_copy(m);
+        Matrix* m_hat = matrix_create(m->rows, m->cols);
+        matrix_copy(m_hat, m);
         matrix_scale(m_hat, 1.0f / (1.0f - beta1_t));
         
-        Matrix* v_hat = matrix_copy(v);
+        Matrix* v_hat = matrix_create(v->rows, v->cols);
+        matrix_copy(v_hat, v);
         matrix_scale(v_hat, 1.0f / (1.0f - beta2_t));
         
         // Update parameters: param = param - lr_t * m_hat / (sqrt(v_hat) + epsilon)

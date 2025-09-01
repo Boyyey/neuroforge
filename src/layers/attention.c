@@ -1,4 +1,5 @@
 #include "layer.h"
+#include "../activations/activation.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -9,7 +10,9 @@ static void attention_forward(Layer* layer, const Matrix* input) {
     // input shape: [batch_size, seq_len, embed_size]
     
     if (layer->input) matrix_free(layer->input);
-    layer->input = matrix_copy(input);
+    // Create a copy of the input matrix
+    layer->input = matrix_create(input->rows, input->cols);
+    matrix_copy(layer->input, input);
     
     // For simplicity, we'll assume input is already projected to Q, K, V
     // In a real implementation, we would have learnable projection matrices
@@ -43,11 +46,15 @@ static void attention_forward(Layer* layer, const Matrix* input) {
 static void attention_backward(Layer* layer, const Matrix* output_grad) {
     // Implementation would go here
     // This is a complex operation that requires careful implementation
+    (void)layer;      // Suppress unused parameter warning
+    (void)output_grad; // Suppress unused parameter warning
 }
 
 // Update parameters for attention layer
 static void attention_update(Layer* layer, float learning_rate) {
     // Implementation would go here
+    (void)layer;        // Suppress unused parameter warning
+    (void)learning_rate; // Suppress unused parameter warning
 }
 
 // Free attention layer resources

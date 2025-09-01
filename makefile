@@ -7,7 +7,8 @@ CUDA_LDFLAGS = -lcudart -lcublas -lcurand
 
 # BLAS configuration (uncomment based on your system)
 # BLAS_LDFLAGS = -lopenblas
-BLAS_LDFLAGS = -lblas
+# BLAS_LDFLAGS = -lblas
+BLAS_LDFLAGS =
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -34,7 +35,7 @@ ifeq ($(HAVE_CUDA), 1)
 	OBJECTS += $(CUDA_OBJECTS)
 endif
 
-.PHONY: all clean examples tests
+.PHONY: all clean clear examples tests
 
 all: $(BIN_DIR)/libnn.a
 
@@ -68,3 +69,6 @@ tests: $(BIN_DIR)/libnn.a
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
+
+clear: clean
+	@echo "Cleaned all build artifacts"

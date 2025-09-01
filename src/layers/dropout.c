@@ -6,7 +6,9 @@
 // Forward pass for dropout layer
 static void dropout_forward(Layer* layer, const Matrix* input) {
     if (layer->input) matrix_free(layer->input);
-    layer->input = matrix_copy(input);
+    // Create a copy of the input matrix
+    layer->input = matrix_create(input->rows, input->cols);
+    matrix_copy(layer->input, input);
     
     if (!layer->output) {
         layer->output = matrix_create(input->rows, input->cols);
@@ -39,6 +41,11 @@ static void dropout_forward(Layer* layer, const Matrix* input) {
 static void dropout_backward(Layer* layer, const Matrix* output_grad) {
     if (!layer->input || !layer->mask) return;
     
+    // Allocate grad_input if needed
+    if (!layer->grad_input) {
+        layer->grad_input = matrix_create(output_grad->rows, output_grad->cols);
+    }
+    
     // Apply the same mask to gradients
     for (size_t i = 0; i < output_grad->rows * output_grad->cols; i++) {
         layer->grad_input->data[i] = output_grad->data[i] * layer->mask->data[i];
@@ -48,6 +55,8 @@ static void dropout_backward(Layer* layer, const Matrix* output_grad) {
 // Update parameters for dropout layer (none needed)
 static void dropout_update(Layer* layer, float learning_rate) {
     // Dropout has no parameters to update
+    (void)layer;        // Suppress unused parameter warning
+    (void)learning_rate; // Suppress unused parameter warning
 }
 
 // Free dropout layer resources
@@ -55,6 +64,7 @@ static void dropout_free(Layer* layer) {
     if (layer->input) matrix_free(layer->input);
     if (layer->output) matrix_free(layer->output);
     if (layer->mask) matrix_free(layer->mask);
+    if (layer->grad_input) matrix_free(layer->grad_input);
     free(layer);
 }
 

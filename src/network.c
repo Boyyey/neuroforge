@@ -1,4 +1,6 @@
 #include "network.h"
+#include "layers/layer.h"
+#include "activations/activation.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,48 +25,54 @@ void network_compile(Network* net, Optimizer* optimizer, float l2_lambda) {
     net->optimizer = optimizer;
     net->l2_lambda = l2_lambda;
     
-    // Collect all parameters for the optimizer
-    int param_count = 0;
-    Layer* layer = net->input_layer;
-    while (layer) {
-        if (layer->weights) param_count++;
-        if (layer->biases) param_count++;
-        layer = layer->next;
-    }
-    
-    net->optimizer->param_count = param_count;
-    net->optimizer->params = (Matrix**)malloc(param_count * sizeof(Matrix*));
-    net->optimizer->grads = (Matrix**)malloc(param_count * sizeof(Matrix*));
-    
-    int idx = 0;
-    layer = net->input_layer;
-    while (layer) {
-        if (layer->weights) {
-            net->optimizer->params[idx] = layer->weights;
-            net->optimizer->grads[idx] = layer->grad_weights;
-            idx++;
+    // Initialize optimizer with network parameters
+    if (net->optimizer) {
+        // Count total parameters
+        int total_params = 0;
+        Layer* layer = net->input_layer;
+        while (layer) {
+            if (layer->weights) total_params++;
+            if (layer->biases) total_params++;
+            layer = layer->next;
         }
-        if (layer->biases) {
-            net->optimizer->params[idx] = layer->biases;
-            net->optimizer->grads[idx] = layer->grad_biases;
-            idx++;
-        }
-        layer = layer->next;
-    }
-    
-    // Initialize Adam moment vectors if needed
-    if (strcmp(net->optimizer->name, "adam") == 0) {
-        net->optimizer->m = (Matrix**)malloc(param_count * sizeof(Matrix*));
-        net->optimizer->v = (Matrix**)malloc(param_count * sizeof(Matrix*));
         
-        for (int i = 0; i < param_count; i++) {
-            Matrix* param = net->optimizer->params[i];
-            net->optimizer->m[i] = matrix_create(param->rows, param->cols);
-            net->optimizer->v[i] = matrix_create(param->rows, param->cols);
-            matrix_fill(net->optimizer->m[i], 0.0f);
-            matrix_fill(net->optimizer->v[i], 0.0f);
+        // Allocate parameter arrays
+        net->optimizer->params = (Matrix**)malloc(total_params * sizeof(Matrix*));
+        net->optimizer->grads = (Matrix**)malloc(total_params * sizeof(Matrix*));
+        net->optimizer->m = (Matrix**)malloc(total_params * sizeof(Matrix*));
+        net->optimizer->v = (Matrix**)malloc(total_params * sizeof(Matrix*));
+        
+        // Fill parameter arrays
+        int i = 0;
+        layer = net->input_layer;
+        while (layer) {
+            if (layer->weights) {
+                net->optimizer->params[i] = layer->weights;
+                net->optimizer->grads[i] = layer->grad_weights;
+                net->optimizer->m[i] = matrix_create(layer->weights->rows, layer->weights->cols);
+                net->optimizer->v[i] = matrix_create(layer->weights->rows, layer->weights->cols);
+                matrix_fill(net->optimizer->m[i], 0.0f);
+                matrix_fill(net->optimizer->v[i], 0.0f);
+                i++;
+            }
+            if (layer->biases) {
+                net->optimizer->params[i] = layer->biases;
+                net->optimizer->grads[i] = layer->grad_biases;
+                net->optimizer->m[i] = matrix_create(layer->biases->rows, layer->biases->cols);
+                net->optimizer->v[i] = matrix_create(layer->biases->rows, layer->biases->cols);
+                matrix_fill(net->optimizer->m[i], 0.0f);
+                matrix_fill(net->optimizer->v[i], 0.0f);
+                i++;
+            }
+            layer = layer->next;
         }
+        
+        net->optimizer->param_count = i;
     }
+}
+
+void network_set_optimizer(Network* net, Optimizer* optimizer) {
+    net->optimizer = optimizer;
 }
 
 Matrix* network_forward(Network* net, const Matrix* input) {
@@ -77,7 +85,10 @@ Matrix* network_forward(Network* net, const Matrix* input) {
         layer = layer->next;
     }
     
-    return matrix_copy(current_output);
+    // Create a copy of the output
+    Matrix* output_copy = matrix_create(current_output->rows, current_output->cols);
+    matrix_copy(output_copy, current_output);
+    return output_copy;
 }
 
 void network_backward(Network* net, const Matrix* target) {
@@ -89,10 +100,14 @@ void network_backward(Network* net, const Matrix* target) {
         if (layer == net->output_layer) {
             // Output layer: compute derivative of loss
             grad = matrix_create(layer->output->rows, layer->output->cols);
-            matrix_subtract(layer->output, target, grad);
+            // Create a copy of target for subtraction
+            Matrix* target_copy = matrix_create(target->rows, target->cols);
+            matrix_copy(target_copy, target);
+            matrix_subtract(layer->output, target_copy);
+            matrix_copy(grad, layer->output);
+            matrix_free(target_copy);
         } else {
             // Hidden layer: backpropagate the gradient
-            Layer* next = layer->next;
             Matrix* new_grad = matrix_create(layer->output->rows, layer->output->cols);
             // This would be computed based on the next layer's backward pass
             // For now, just copy (simplified)
@@ -102,7 +117,12 @@ void network_backward(Network* net, const Matrix* target) {
         }
         
         layer->backward(layer, grad);
-        layer = layer->prev;
+        // Move to previous layer by traversing backwards through the list
+        Layer* prev_layer = net->input_layer;
+        while (prev_layer && prev_layer->next != layer) {
+            prev_layer = prev_layer->next;
+        }
+        layer = prev_layer;
     }
     
     if (grad) matrix_free(grad);
