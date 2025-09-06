@@ -59,7 +59,7 @@ ACTIVATION_SELU       // Self-normalizing magic
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/neuroforge.git
+git clone https://github.com/boyyey/neuroforge.git
 cd neuroforge
 
 # Build everything (recommended)
